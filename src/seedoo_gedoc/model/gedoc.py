@@ -2,7 +2,7 @@
 # This file is part of Seedoo.  The COPYRIGHT file at the top level of
 # this module contains the full copyright notices and license terms.
 
-from openerp.osv import fields, osv
+from openerp.osv import fields, osv, SUPERUSER_ID
 from tools.translate import _
 
 
@@ -102,7 +102,7 @@ class protocollo_dossier(osv.Model):
         name = ''
         if parent_id and dossier_type != 'fascicolo':
             parent = self.pool.get('protocollo.dossier').browse(
-                cr, uid, parent_id, context=context)
+                cr, SUPERUSER_ID, parent_id, context=context)
             classification_id = parent.classification_id.id
             num = len(parent.child_ids) + 1
             name = '<' + self.DOSSIER_TYPE[dossier_type] + ' N.' + \
@@ -111,7 +111,7 @@ class protocollo_dossier(osv.Model):
         elif dossier_type and dossier_type in self.DOSSIER_TYPE and \
                 classification_id:
             classification = self.pool.get('protocollo.classification').\
-                browse(cr, uid, classification_id, context=context)
+                browse(cr, SUPERUSER_ID, classification_id, context=context)
             num = len(classification.dossier_ids) + 1
             name = '<' + self.DOSSIER_TYPE[dossier_type] + ' N.' + \
                 str(num) + ' del \'' + \
@@ -374,7 +374,7 @@ class protocollo_dossier(osv.Model):
         return False
 
     def action_open(self, cr, uid, ids, *args):
-        for dossier in self.browse(cr, uid, ids):
+        for dossier in self.browse(cr, SUPERUSER_ID, ids):
             if dossier.parent_id:
                 num = len(
                     [d.id for d in dossier.parent_id.child_ids
